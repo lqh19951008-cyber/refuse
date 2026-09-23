@@ -70,6 +70,16 @@ export async function findDecision(
   return all.find((d) => d.id === id || d.id.endsWith(id));
 }
 
+/** 取最近的决定（可按类别过滤），用于给代理做“避免重复/轮换”的参考 */
+export async function recentDecisions(
+  category?: string,
+  limit = 6,
+): Promise<DecisionRecord[]> {
+  const all = await readDecisions();
+  const filt = category ? all.filter((d) => d.rec.category === category) : all;
+  return filt.slice(-limit).reverse();
+}
+
 export function newId(): string {
   const now = new Date();
   const stamp = now.toISOString().replace(/[-:.TZ]/g, "").slice(0, 14);
