@@ -29,8 +29,12 @@ export async function jsonChat(
   system: string,
   user: string,
 ): Promise<unknown> {
+  // 注意：该网关的模型是推理模型，思考会消耗 token，max_tokens 必须给足，
+  // 否则 content 会被截断甚至为 null。
+  const maxTokens = Number(process.env.DEEPSEEK_MAX_TOKENS ?? 8000);
   const res = await client().chat.completions.create({
     model: modelName(),
+    max_tokens: maxTokens,
     response_format: { type: "json_object" },
     messages: [
       { role: "system", content: system },
